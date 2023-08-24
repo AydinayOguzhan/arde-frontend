@@ -1,0 +1,248 @@
+<app-navbar></app-navbar>
+
+<div class="container-fluid">
+  <div *ngIf="isLoaded" class="mt-3">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="text-end">
+          <b>Invoice No:</b> {{invoiceDetails.invoiceNo}} <br>
+          <b>Invoice currency:</b> {{invoiceDetails.currency}} <br>
+          <b>Invoice Date:</b> {{invoiceDetails.createdDate | date:"short"}}
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="text-center">
+          <h5>Invoice</h5>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <img style="background-color: black; border-radius: 5px;"
+              src="https://static.wixstatic.com/media/04822c_20c64f91d8ad4b689bbc7f0829b5afd7~mv2.png/v1/fill/w_243,h_95,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/Arde-Bilişim-Yeni-Logo.png"
+              alt="not fond">
+
+            <div class="ms-1 mt-3">
+              {{invoiceDetails.createdBy.firstName}} {{invoiceDetails.createdBy.lastName}} <br>
+              {{invoiceDetails.createdBy.userEmail}} <br>
+              {{invoiceDetails.address}} <br> <br>
+              <button (click)="openChangeCreatedByModel()" class="btn btn-outline-secondary" type="button" data-bs-toggle="modal" data-bs-target="#changeCreatedByModal">Change</button>
+            </div>
+            <br>
+
+            <div class="mt-3">
+
+            </div>
+          </div>
+
+
+          <div class="col-md-6">
+            <div class="text-end">
+              <h4>Customer Information</h4>
+              <b>Customer No: </b> {{invoiceDetails.customer.customerNo}} <br>
+              {{invoiceDetails.customer.customerName}} <br>
+              {{invoiceDetails.customer.address}} <br>
+
+              {{invoiceDetails.customer.contactName}} <br>
+              {{invoiceDetails.customer.contactPhone}} <br>
+              {{invoiceDetails.customer.contactEmail}} <br><br>
+
+              <button (click)="openCustomerUpdateModal()" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#changeCustomerModal">Change</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="m-3">
+          <div>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col"></th>
+                  <th scope="col"></th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Unit Price</th>
+                  <th scope="col">Quantity</th>
+                  <th scope="col" class="text-end">Line Total</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <ng-container *ngFor="let product of invoiceDetails.products">
+                  <tr>
+                    <td><button class="btn btn-outline-success" type="button" data-bs-toggle="modal"
+                      data-bs-target="#updateProductModal" (click)="openUpdateProductModal(product)">Update</button></td>
+                    <td><button class="btn btn-outline-danger" (click)="deleteInvoiceProduct(product.invoiceProductId)">Delete</button></td>
+                    <th scope="row">{{product.name}}</th>
+                    <td>{{product.unitPrice}}</td>
+                    <td>{{product.quantity}}</td>
+                    <td class="text-end">{{product.lineTotal | currency: invoiceDetails.currency}}</td>
+                  </tr>
+                </ng-container>
+
+              </tbody>
+            </table>
+            <div class="text-end">
+              <b>Grand Total:</b> {{grandTotal | currency:invoiceDetails.currency}}
+            </div>
+
+            <button type="button" (click)="getAllProducts()" class="btn btn-outline-secondary" data-bs-toggle="modal"
+              data-bs-target="#addProductModal">Add Product</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="card-footer">
+        <div class="text-end">
+          <button class="btn btn-success me-3" (click)="updateAll()">Update</button>
+          <button class="btn btn-danger" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div *ngIf="!isLoaded">
+    <div class="text-center">
+      <h1>Something went wrong</h1>
+    </div>
+  </div>
+</div>
+<br><br>
+
+
+<!-- Add product modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Add Product</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="isProductsLoaded">
+          <form [formGroup]="addProductForm">
+            <select formControlName="productId" class="form-select" aria-label="Default select example">
+              <option value="0" selected>Select a product</option>
+              <ng-container *ngFor="let product of products">
+                <option value="{{product.id}}">{{product.name}}</option>
+              </ng-container>
+            </select>
+            <br>
+            <input formControlName="productQuantity" class="form-control" placeholder="quantity" type="number" />
+          </form>
+        </ng-container>
+
+        <ng-container *ngIf="!isProductsLoaded">
+          <h2>Something went wrong</h2>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" (click)="addNewProductToInvoice()" class="btn btn-success">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Update product modal -->
+<div class="modal fade" id="updateProductModal" tabindex="-1" aria-labelledby="updateProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Product</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="isInvoiceProductToUpdateLoaded">
+          <form [formGroup]="invoiceProductUpdateForm">
+            <label><b>Name: </b></label> &nbsp;
+            <label>{{invoiceProductToUpdate.name}}</label><br>
+
+            <label><b>Unit Price: </b></label> &nbsp;
+            <label>{{invoiceProductToUpdate.unitPrice}}</label><br>
+
+            <label><b>Quantity: </b></label>
+            <input formControlName="productQuantity" class="form-control" placeholder="quantity" type="number" />
+          </form>
+        </ng-container>
+
+        <ng-container *ngIf="!invoiceProductUpdateForm">
+          <h2>Something went wrong</h2>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" (click)="updateProduct()" class="btn btn-success">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Change created by modal -->
+<div class="modal fade" id="changeCreatedByModal" tabindex="-1" aria-labelledby="changeCreatedByModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Created By</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="isUsersLoaded">
+          <select (change)="changeSelectedUser($event)" class="form-select" aria-label="Default select example">
+            <option value="0">Open this select menu</option>
+
+            <ng-container *ngFor="let user of users">
+              <option [selected]="user.userId == invoiceDetails.createdBy.userId?true:false" value="{{user.userId}}">{{user.firstName}} {{user.lastName}}</option>
+            </ng-container>
+
+          </select>
+        </ng-container>
+
+        <ng-container *ngIf="!isUsersLoaded">
+          <h2>Something went wrong</h2>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" (click)="updateCreatedBy()" class="btn btn-success">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Change customer modal -->
+<div class="modal fade" id="changeCustomerModal" tabindex="-1" aria-labelledby="changeCustomerModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Update Customer</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="isCustomersLoaded">
+          <select (change)="changeSelectedCustomer($event)" class="form-select" aria-label="Default select example">
+            <option value="0">Open this select menu</option>
+
+            <ng-container *ngFor="let customer of customers">
+              <option [selected]="customer.id == invoiceDetails.customer.id?true:false" value="{{customer.id}}">{{customer.customerName}}</option>
+            </ng-container>
+
+          </select>
+        </ng-container>
+
+        <ng-container *ngIf="!isCustomersLoaded">
+          <h2>Something went wrong</h2>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" (click)="updateCustomer()" class="btn btn-success">Update</button>
+      </div>
+    </div>
+  </div>
+</div>

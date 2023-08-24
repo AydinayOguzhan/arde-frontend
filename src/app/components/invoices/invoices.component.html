@@ -1,0 +1,42 @@
+<div class="container-fluid">
+
+
+  <div *ngIf="isInvoiceList" class="mt-3">
+    <div class="mb-3">
+      <button class="btn btn-success" (click)="openAddPage()">Create Invoice</button>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Invoice Id</th>
+          <th scope="col">Invoice No</th>
+          <th scope="col">Created Date</th>
+          <th scope="col">Customer Name</th>
+          <th scope="col"></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <ng-container *ngFor="let invoice of invoiceList">
+          <tr>
+            <th scope="row">{{invoice.invoiceId}}</th>
+            <td>{{invoice.invoiceNo}}</td>
+            <td>{{invoice.createdDate | date : "short"}}</td>
+            <td>{{invoice.customerName}}</td>
+
+            <td><button class="btn btn-outline-success" (click)="openUpdatePage(invoice.invoiceId)">Update</button></td>
+            <td><button class="btn btn-outline-danger" (click)="delete(invoice.invoiceId)">Delete</button></td>
+          </tr>
+        </ng-container>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!isInvoiceList">
+    <div class="text-center">
+      <h1>Something went wrong</h1>
+    </div>
+  </div>
+</div>

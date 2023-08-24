@@ -1,0 +1,33 @@
+<app-navbar></app-navbar>
+<div class="container-fluid">
+
+  <div *ngIf="isLoaded" class="mt-3">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Id</th>
+          <th scope="col">Name</th>
+          <th scope="col">Unit Price</th>
+          <th scope="col">Stock Quantity</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <ng-container *ngFor="let product of products">
+
+          <tr>
+            <th scope="row">{{product.id}}</th>
+            <td>{{product.name}}</td>
+            <td>{{product.unitPrice}}</td>
+            <td>{{product.stockQuantity}}</td>
+          </tr>
+        </ng-container>
+
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!isLoaded">
+    <div class="text-center"><h1>Something Went Wrong</h1></div>
+  </div>
+</div>

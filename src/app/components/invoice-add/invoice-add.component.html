@@ -1,0 +1,183 @@
+<app-navbar></app-navbar>
+
+<div class="container-fluid">
+  <div class="mt-3">
+    <div class="card">
+      <div class="card-header">
+        <h4>Create Invoice</h4>
+      </div>
+
+
+      <div class="card-body">
+        <form [formGroup]="invoiceForm">
+          <div class="mb-2">
+            <div class="mb-2">
+              <b>Created By:</b>
+            </div>
+            <ng-container *ngIf="isUserLoaded">
+
+              <select formControlName="createdBy" class="form-select" aria-label="Default select example">
+                <option selected value="0">Open this select menu</option>
+
+                <ng-container *ngFor="let user of users">
+                  <option value="{{user.userId}}">{{user.firstName}} {{user.lastName}}</option>
+                </ng-container>
+
+              </select>
+            </ng-container>
+
+            <ng-container *ngIf="!isUserLoaded">
+              <h5>Something went wrong</h5>
+            </ng-container>
+          </div>
+
+          <div class="mb-2">
+            <div class="mb-2">
+              <b>Customer:</b>
+            </div>
+            <ng-container *ngIf="isCustomerLoaded">
+
+              <select formControlName="customerId" class="form-select" aria-label="Default select example">
+                <option selected value="0">Open this select menu</option>
+
+                <ng-container *ngFor="let customer of customers">
+                  <option value="{{customer.id}}">{{customer.customerName}}</option>
+                </ng-container>
+
+              </select>
+            </ng-container>
+
+            <ng-container *ngIf="!isCustomerLoaded">
+              <h5>Something went wrong</h5>
+            </ng-container>
+          </div>
+
+          <div class="mb-2">
+            <div class="mb-2">
+              <b>Invoice No:</b>
+            </div>
+
+            <input class="form-control" type="number" formControlName="invoiceNo" >
+          </div>
+
+          <div class="mb-2">
+            <div class="mb-2">
+              <b>Address:</b>
+            </div>
+
+            <textarea class="form-control" formControlName="address" cols="30" rows="5"></textarea>
+          </div>
+
+          <div class="mb-2">
+            <div class="mb-2">
+              <b>Created Date:</b>
+            </div>
+
+            <input class="form-control" type="datetime-local" formControlName="createdDate" >
+          </div>
+
+          <div class="mb-2">
+            <div class="mb-2">
+              <b>Currency:</b>
+            </div>
+            <ng-container *ngIf="isCurrencyLoaded">
+
+              <select formControlName="currency" class="form-select" aria-label="Default select example">
+                <option selected value="0">Open this select menu</option>
+
+                <ng-container *ngFor="let currency of currencies">
+                  <option value="{{currency.id}}">{{currency.name}}</option>
+                </ng-container>
+
+              </select>
+            </ng-container>
+
+            <ng-container *ngIf="!isCurrencyLoaded">
+              <h5>Something went wrong</h5>
+            </ng-container>
+          </div>
+
+          <div class="m-3">
+            <div>
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col"></th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Unit Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col" class="text-end">Line Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <ng-container *ngFor="let product of selectedProducts">
+                    <tr>
+                      <td><button class="btn btn-outline-danger" (click)="deleteFromSelectedProduct(product.productId)">Delete</button></td>
+                      <th scope="row">{{product.name}}</th>
+                      <td>{{product.unitPrice}}</td>
+                      <td>{{product.quantity}}</td>
+                      <td class="text-end">{{product.lineTotal}}</td>
+                    </tr>
+                  </ng-container>
+
+                </tbody>
+              </table>
+              <div class="text-end">
+                <b>Grand Total:</b> {{grandTotal}}
+              </div>
+
+              <button type="button" (click)="openAddSelectedProductModal()" class="btn btn-outline-secondary" data-bs-toggle="modal"
+                data-bs-target="#addProductModal">Add Product</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+      <div class="card-footer">
+        <div class="text-end">
+          <button class="btn btn-danger me-2" (click)="cancel()">Cancel</button>
+          <button class="btn btn-success" (click)="createInvoice()">Create</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<br><br>
+
+
+<!-- Add product modal -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Add Product</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ng-container *ngIf="isProductLoaded">
+          <form [formGroup]="selectedProductForm">
+            <select formControlName="productId" class="form-select" aria-label="Default select example">
+              <option value="0" selected>Select a product</option>
+              <ng-container *ngFor="let product of products">
+                <option value="{{product.id}}">{{product.name}}</option>
+              </ng-container>
+            </select>
+            <br>
+            <input formControlName="productQuantity" class="form-control" placeholder="quantity" type="number" />
+          </form>
+        </ng-container>
+
+        <ng-container *ngIf="!isProductLoaded">
+          <h2>Something went wrong</h2>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" (click)="addSelectedProduct()" class="btn btn-success">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
